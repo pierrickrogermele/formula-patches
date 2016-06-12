@@ -1,0 +1,109 @@
+diff -ruwNB cfm/CMakeLists.txt cfm-patched/CMakeLists.txt
+--- cfm/CMakeLists.txt	2016-06-08 15:50:22.000000000 +0200
++++ cfm-patched/CMakeLists.txt	2016-06-08 15:34:06.000000000 +0200
+@@ -34,7 +34,7 @@
+ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR} )
+ include (FindRDKit)
+ if (RDKIT_FOUND)
+-    include_directories( ${RDKIT_INCLUDE_DIR} ${RDKIT_INCLUDE_EXT_DIR} )
++    include_directories( ${RDKIT_INCLUDE_DIR} )
+     link_directories ( ${RDKIT_LIBRARY_DIR} )
+ else ()
+     message (FATAL_ERROR "Could not find RDKit" )
+diff -ruwNB cfm/FindRDKit.cmake cfm-patched/FindRDKit.cmake
+--- cfm/FindRDKit.cmake	2016-06-08 15:50:22.000000000 +0200
++++ cfm-patched/FindRDKit.cmake	2016-06-08 15:33:50.000000000 +0200
+@@ -47,28 +47,29 @@
+           $ENV{RDBASE}/Code
+           /usr/local/rdkit/include/Code
+           /usr/local/rdkit/include
++          /usr/local/include/rdkit
+           /usr/local/rdkit/Code
+           ~/rdkit/Code
+       )
+-      find_path(RDKIT_INCLUDE_EXT_DIR INCHI-API/inchi.h
+-        PATHS
+-          ${RDKIT_DIR}/External
+-          $ENV{RDKIT_INCLUDE_EXT_DIR}
+-          $ENV{RDKIT_INCLUDE_EXT_PATH}
+-          $ENV{RDKIT_BASE}/External
+-          $ENV{RDBASE}/External
+-          /usr/local/rdkit/include/External
+-          /usr/local/rdkit/include
+-          /usr/local/rdkit/External
+-          ~/rdkit/External
+-      )      
++  #      find_path(RDKIT_INCLUDE_EXT_DIR INCHI-API/inchi.h
++  #        PATHS
++  #          ${RDKIT_DIR}/External
++  #          $ENV{RDKIT_INCLUDE_EXT_DIR}
++  #          $ENV{RDKIT_INCLUDE_EXT_PATH}
++  #          $ENV{RDKIT_BASE}/External
++  #          $ENV{RDBASE}/External
++  #          /usr/local/rdkit/include/External
++  #          /usr/local/rdkit/include
++  #          /usr/local/rdkit/External
++  #          ~/rdkit/External
++  #      )      
+     endif()
+     if(RDKIT_INCLUDE_DIR)
+        message(STATUS "Found RDKit include files at ${RDKIT_INCLUDE_DIR}")
+     endif()
+-    if(RDKIT_INCLUDE_EXT_DIR)
+-       message(STATUS "Found RDKit include files at ${RDKIT_INCLUDE_EXT_DIR}")
+-    endif()    
++	#    if(RDKIT_INCLUDE_EXT_DIR)
++	#       message(STATUS "Found RDKit include files at ${RDKIT_INCLUDE_EXT_DIR}")
++	#    endif()    
+   endif()
+ 
+   if(NOT RDKIT_LIBRARIES)
+@@ -138,10 +139,10 @@
+     endif()
+   endif()
+ 
+-  if(RDKIT_INCLUDE_DIR AND RDKIT_INCLUDE_EXT_DIR AND RDKIT_LIBRARIES)
++  if(RDKIT_INCLUDE_DIR AND RDKIT_LIBRARIES)
+     set(RDKIT_FOUND TRUE)
+   endif()
+ 
+   mark_as_advanced(RDINCHI_LIB INCHI_LIB GASTEIGER_LIB SUBSTRUCT_LIB RDGENERAL_LIB RDGEOMETRYLIB_LIB GRAPHMOL_LIB DEPICTOR_LIB SMILESPARSE_LIB FILEPARSERS_LIB)
+-  mark_as_advanced(RDKIT_INCLUDE_DIR RDKIT_INCLUDE_EXT_DIR RDKIT_LIBRARIES)
++  mark_as_advanced(RDKIT_INCLUDE_DIR RDKIT_LIBRARIES)
+ endif()
+diff -ruwNB cfm/cfm-code/FragmentGraphGenerator.cpp cfm-patched/cfm-code/FragmentGraphGenerator.cpp
+--- cfm/cfm-code/FragmentGraphGenerator.cpp	2016-06-08 15:50:22.000000000 +0200
++++ cfm-patched/cfm-code/FragmentGraphGenerator.cpp	2016-06-08 15:34:44.000000000 +0200
+@@ -26,7 +26,7 @@
+ #include <GraphMol/RingInfo.h>
+ #include <GraphMol/SmilesParse/SmilesParse.h>
+ #include <GraphMol/SmilesParse/SmilesWrite.h>
+-#include <INCHI-API/inchi.h>
++#include <GraphMol/inchi.h>
+ 
+ 
+ 
+diff -ruwNB cfm/cfm-code/MolData.cpp cfm-patched/cfm-code/MolData.cpp
+--- cfm/cfm-code/MolData.cpp	2016-06-08 15:50:22.000000000 +0200
++++ cfm-patched/cfm-code/MolData.cpp	2016-06-08 15:34:54.000000000 +0200
+@@ -28,7 +28,7 @@
+ #include <GraphMol/RDKitBase.h>
+ #include <GraphMol/Fingerprints/Fingerprints.h>
+ #include <RDGeneral/types.h>
+-#include <INCHI-API/inchi.h>
++#include <GraphMol/inchi.h>
+ 
+ #include <string>
+ #include <iostream>
+diff -ruwNB cfm/cfm-code/Util.cpp cfm-patched/cfm-code/Util.cpp
+--- cfm/cfm-code/Util.cpp	2016-06-08 15:50:22.000000000 +0200
++++ cfm-patched/cfm-code/Util.cpp	2016-06-08 15:35:01.000000000 +0200
+@@ -21,7 +21,7 @@
+ #include <GraphMol/MolOps.h>
+ #include <GraphMol/PeriodicTable.h>
+ #include <GraphMol/AtomIterators.h>
+-#include <INCHI-API/inchi.h>
++#include <GraphMol/inchi.h>
+ 
+ double getMassTol( double abs_tol, double ppm_tol, double mass ){
+ 	double mass_tol = (mass/1000000.0) * ppm_tol;
